@@ -22,7 +22,13 @@ namespace MonkeRealism
             Plugin.Instance.TrackerFollower.transform.SetParent(Plugin.Instance.TrackerObject.transform, false);
             
             Plugin.Instance.TrackerFollower.transform.localRotation = Plugin.Instance.TrackerOffset;
-            
+
+            Plugin.Instance.LeftElbowObject = new GameObject("Left Elbow Tracker");
+            Plugin.Instance.LeftElbowObject.transform.SetParent(GTPlayer.Instance.turnParent.transform, false);
+
+            Plugin.Instance.RightElbowObject = new GameObject("Right Elbow Tracker");
+            Plugin.Instance.RightElbowObject.transform.SetParent(GTPlayer.Instance.turnParent.transform, false);
+
             EVRInitError error = EVRInitError.None;
 
             OpenVR.Init(

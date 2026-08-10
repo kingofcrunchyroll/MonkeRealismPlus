@@ -30,6 +30,8 @@ namespace MonkeRealism
         public GameObject TrackerObject;
         public GameObject TrackerFollower;
         public GameObject TrackerParent;
+        public GameObject LeftElbowObject;
+        public GameObject RightElbowObject;
 
         public Quaternion TrackerOffset = Quaternion.identity;
         public Quaternion LeftElbowOffset = Quaternion.identity;
@@ -157,13 +159,12 @@ namespace MonkeRealism
             {
                 Transform rigRoot = GorillaTagger.Instance.offlineVRRig.transform;
                 MonkeRealism.Core.BodyColliderFix.Refresh();
-                MonkeRealism.Core.ElbowTrackingManager.Initialize(rigRoot);
             });
 
-            PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable
-            {
-                { Constants.HashKey, Constants.Version },
-            });
+            //PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable
+            //{
+            //    { Constants.HashKey, Constants.Version },
+            //});
 
             Stream bundleStream = Assembly.GetExecutingAssembly()
                                           .GetManifestResourceStream("MonkeRealism.Assets.monkerealism");
@@ -174,6 +175,12 @@ namespace MonkeRealism
             calibrateSound = bundle.LoadAsset<AudioClip>("MonkeRealismCalibrate");
             titleFont = bundle.LoadAsset<Font>("Coolvetica");
             mainFont = bundle.LoadAsset<Font>("Jersey");
+            // In Plugin.cs Start(), after GorillaTagger.OnPlayerSpawned:
+            NetworkSystem.Instance.OnMultiplayerStarted += () =>
+            {
+                if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.MaxPlayers > 10)
+                    PhotonNetwork.CurrentRoom.MaxPlayers = 10;
+            };
         }
 
         private void Update()
@@ -225,13 +232,13 @@ namespace MonkeRealism
                 }
             }
 
-            if (ShouldUseElbowTracking.Value)
-            {
-                MonkeRealism.Core.ElbowTrackingManager.ApplyRotations(
-                    LeftElbowTrackerName.Value,
-                    RightElbowTrackerName.Value,
-                    TrackerOffset);
-            }
+            Quaternion? leftRot = TrackerManager.GetTrackerRotation(LeftElbowTrackerName.Value);
+            if (leftRot.HasValue)
+                LeftElbowObject.transform.localRotation = leftRot.Value;
+
+            Quaternion? rightRot = TrackerManager.GetTrackerRotation(RightElbowTrackerName.Value);
+            if (rightRot.HasValue)
+                RightElbowObject.transform.localRotation = rightRot.Value;
 
             Quaternion? trackerRot = TrackerManager.GetTrackerRotation(TrackerName.Value);
             if (!trackerRot.HasValue) return;

@@ -8,9 +8,11 @@
     <Reference Include="0Harmony">
       <HintPath>$(BepInExAssemblyPath)\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp" Publicize="True">
-      <HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
-    </Reference>
+	  <Reference Include="Assembly-CSharp">
+		  <HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
+	  </Reference>
+
+	  <Publicize Include="$(GameAssemblyPath)\Assembly-CSharp.dll" />
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>$(GameAssemblyPath)\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
@@ -296,7 +298,7 @@
   </ItemGroup>
 
     <ItemGroup>
-	    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1">
+	    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3">
 		    <PrivateAssets>all</PrivateAssets>
 		    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	    </PackageReference>

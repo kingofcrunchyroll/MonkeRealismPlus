@@ -37,31 +37,26 @@ internal static class GorillaIKMgrCopyInputPatch
     private static void FeedElbow(GorillaIK gorillaIK, Plugin plugin, VRRig rig,
     float scale, Quaternion bodyRot, Vector3? chestPos, Quaternion? chestRot, bool isLeft)
     {
-        string trackerName = isLeft ? plugin.LeftElbowTrackerName.Value : plugin.RightElbowTrackerName.Value;
-        if (string.IsNullOrEmpty(trackerName)) return;
+        var elbowObject = isLeft ? plugin.LeftElbowObject : plugin.RightElbowObject;
+        if (elbowObject == null) return;
 
-        var trackerRot = TrackerManager.GetTrackerRotation(trackerName);
-        if (!trackerRot.HasValue) return;
+        // Read localRotation from the turnParent-childed GameObject
+        // This automatically handles smooth/snap turning the same way the waist tracker does
+        Quaternion trackerRot = elbowObject.transform.localRotation;
 
         // Apply user offset
-        trackerRot = trackerRot.Value * (isLeft ? plugin.LeftElbowOffset : plugin.RightElbowOffset);
+        trackerRot = trackerRot * (isLeft ? plugin.LeftElbowOffset : plugin.RightElbowOffset);
 
-        // Get hand position
-        Vector3 handPos = GetHandWorldPosition(rig, isLeft);
-
-        // Get shoulder parent for space conversion
         var shoulderParent = isLeft
             ? gorillaIK.leftUpperArm?.parent
             : gorillaIK.rightUpperArm?.parent;
 
         if (shoulderParent == null) return;
 
-        // Use tracker's downward axis as the elbow hint direction
-        // Try Vector3.down, Vector3.forward, Vector3.right — we'll start with down
-        Vector3 trackerDown = trackerRot.Value * Vector3.down;
-
-        // Convert to shoulder-parent local space
-        Vector3 elbowDir = shoulderParent.InverseTransformDirection(trackerDown);
+        // Transform from turnParent local space into shoulder parent space
+        Vector3 elbowDir = shoulderParent.InverseTransformDirection(
+            elbowObject.transform.parent.TransformDirection(
+                trackerRot * Vector3.down)); // replace Vector3.down with whatever axis you found works
 
         if (isLeft)
         {
