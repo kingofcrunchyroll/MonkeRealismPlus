@@ -1,10 +1,12 @@
-﻿using System.Globalization;
-using System.IO;
-using System.Reflection;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Configuration;
 using Photon.Pun;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
@@ -229,6 +231,44 @@ namespace MonkeRealism
 
                     calibrating = false;
                     playedCalibrationSound = false;
+                }
+
+                VRRig localRig = null;
+
+                if (NetworkSystem.Instance.InRoom && localRig == null)
+                {
+                    foreach (VRRig rig in VRRigCache.AllRigs)
+                    {
+                        if (rig.Creator.IsLocal)
+                        {
+                            localRig = rig;
+                        }
+                    }
+                }
+                else if (!NetworkSystem.Instance.InRoom)
+                {
+                    localRig = null;
+                }
+
+                if (localRig != null)
+                {
+                    GorillaIK ik = localRig.GetComponent<GorillaIK>();
+                    if (ik == null)
+                        return;
+
+                    Quaternion leftTrackerRot = LeftElbowObject.transform.localRotation;
+                    Quaternion rightTrackerRot = RightElbowObject.transform.localRotation;
+
+                    leftTrackerRot = leftTrackerRot * LeftElbowOffset;
+                    rightTrackerRot = rightTrackerRot * RightElbowOffset;
+
+                    Vector3 leftElbowDir = ik.leftUpperArm.parent.InverseTransformDirection(LeftElbowObject.transform.parent.TransformDirection(leftTrackerRot * Vector3.down));
+                    Vector3 rightElbowDir = ik.rightUpperArm.parent.InverseTransformDirection(RightElbowObject.transform.parent.TransformDirection(rightTrackerRot * Vector3.down));
+
+                    ik.leftElbowDirection = leftElbowDir;
+                    ik.rightElbowDirection = rightElbowDir;
+                    ik.lerpLeftElbowDirection = leftElbowDir;
+                    ik.lerpRightElbowDirection = rightElbowDir;
                 }
             }
 
