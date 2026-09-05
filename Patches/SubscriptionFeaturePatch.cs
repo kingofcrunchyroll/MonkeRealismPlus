@@ -1,9 +1,12 @@
-﻿using GorillaTagScripts;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using GorillaTagScripts;
 using HarmonyLib;
 
 namespace MonkeRealismPlus.Patches
 {
-    [HarmonyPatch(typeof(SubscriptionManager), nameof(SubscriptionManager.GetSubscriptionSettingBool))]
+    [HarmonyPatch(typeof(SubscriptionManager), nameof(SubscriptionManager.IsSubscriptionFeatureAvailable))]
     internal static class SubscriptionFeaturePatch
     {
         [HarmonyPostfix]

@@ -1,6 +1,9 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using GorillaNetworking;
+using GorillaTagScripts;
 using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -103,8 +106,6 @@ namespace MonkeRealism
         private Rect windowRect = new Rect(15, 15, 340, 1665);
         private GUIStyle windowStyle;
 
-        //private GorillaNetworking.GorillaComputer GC;
-
         private void Awake()
         {
             Instance = this;
@@ -163,6 +164,8 @@ namespace MonkeRealism
             {
                 Transform rigRoot = GorillaTagger.Instance.offlineVRRig.transform;
                 MonkeRealism.Core.BodyColliderFix.Refresh();
+
+                StartCoroutine(EnableIOBTWhenReady());
             });
 
             //PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable
@@ -179,6 +182,18 @@ namespace MonkeRealism
             calibrateSound = bundle.LoadAsset<AudioClip>("MonkeRealismCalibrate");
             titleFont = bundle.LoadAsset<Font>("Coolvetica");
             mainFont = bundle.LoadAsset<Font>("Jersey");
+        }
+
+        private IEnumerator EnableIOBTWhenReady()
+        {
+            yield return new WaitUntil(() => GorillaIK.playerIK != null);
+
+            GorillaComputer.instance.iobtMode = true;
+
+            SubscriptionManager.SetSubscriptionSettingValue(
+                SubscriptionManager.SubscriptionFeatures.IOBT, 1);
+
+            GorillaIK.playerIK.DelayedUpdateIK(true);
         }
 
         private void Update()
