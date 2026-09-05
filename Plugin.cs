@@ -177,12 +177,6 @@ namespace MonkeRealism
             calibrateSound = bundle.LoadAsset<AudioClip>("MonkeRealismCalibrate");
             titleFont = bundle.LoadAsset<Font>("Coolvetica");
             mainFont = bundle.LoadAsset<Font>("Jersey");
-            // In Plugin.cs Start(), after GorillaTagger.OnPlayerSpawned:
-            NetworkSystem.Instance.OnMultiplayerStarted += () =>
-            {
-                if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.MaxPlayers > 10)
-                    PhotonNetwork.CurrentRoom.MaxPlayers = 10;
-            };
         }
 
         private void Update()

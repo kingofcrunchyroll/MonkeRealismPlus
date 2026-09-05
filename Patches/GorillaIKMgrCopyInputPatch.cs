@@ -17,12 +17,8 @@ internal static class GorillaIKMgrCopyInputPatch
         var gorillaIK = rig.GetComponent<GorillaIK>();
         if (gorillaIK == null) return;
 
-        // === FORCE THE IK MODE ===
-        gorillaIK.usingUpdatedIK = true;
-        gorillaIK.canUseUpdatedIK = true;
-
-        if (GorillaIKMgr.playerIK == gorillaIK)
-            GorillaIKMgr.playerIK.usingUpdatedIK = true;
+        // IK mode flags are already forced on by GorillaIKSkeletonUpdatePatch,
+        // which runs earlier in GorillaIKMgr.LateUpdate() (via SkeletonUpdate()).
 
         var scale = rig.scaleFactor;
         var bodyRot = plugin.TrackerFollower?.transform.rotation ?? rig.transform.rotation;
