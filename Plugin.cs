@@ -103,6 +103,8 @@ namespace MonkeRealism
         private Rect windowRect = new Rect(15, 15, 340, 1665);
         private GUIStyle windowStyle;
 
+        //private GorillaNetworking.GorillaComputer GC;
+
         private void Awake()
         {
             Instance = this;
@@ -169,7 +171,7 @@ namespace MonkeRealism
             //});
 
             Stream bundleStream = Assembly.GetExecutingAssembly()
-                                          .GetManifestResourceStream("MonkeRealism.Assets.monkerealism");
+                                          .GetManifestResourceStream("MonkeRealism+.Assets.monkerealism");
 
             AssetBundle bundle = AssetBundle.LoadFromStream(bundleStream);
 
